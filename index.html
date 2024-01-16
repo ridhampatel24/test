@@ -3,9 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <style>
+        /* Basic styling for the button */
+        .animated-button {
+            display: inline-block;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: white;
+            background-color: #3498db;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Create the red color animation from left to right */
+        .animated-button::before {
+            content: '';
+            background-color: #e74c3c; /* Red color */
+            height: 100%;
+            width: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: width 0.3s ease;
+            z-index: -1; /* Move it behind the button content */
+        }
+
+        /* Change the background color on hover and expand the red animation */
+        .animated-button:hover {
+            background-color: #e74c3c;
+        }
+
+        .animated-button:hover::before {
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
-    
+
+    <!-- Example button -->
+    <a href="#" class="animated-button">Hover me</a>
+
 </body>
 </html>
