@@ -30,9 +30,8 @@ jobs:
           # Fetch the private IPs of those instances
           PRIVATE_IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS --region $REGION --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
 
-          # Convert new line-separated IPs into a comma-separated list
-          COMMA_SEPARATED_IPS=$(echo "$PRIVATE_IPS" | tr '\n' ',')
-          COMMA_SEPARATED_IPS=${COMMA_SEPARATED_IPS%,}  # Remove the trailing comma
+          # Convert tab-separated IPs into a comma-separated list
+          COMMA_SEPARATED_IPS=$(echo "$PRIVATE_IPS" | tr '\t' ',')
 
           # Output the IPs and save them to the custom file
           echo "Private IPs: $COMMA_SEPARATED_IPS"
