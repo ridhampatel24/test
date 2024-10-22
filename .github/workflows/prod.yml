@@ -15,15 +15,14 @@ jobs:
           TAG_VALUE="Ridham"
           REGION="ap-south-1"
           
-          INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:${TAG_KEY},Values=${TAG_VALUE}" --query 'Reservations[*].Instances[*].InstanceId' --output text --region $REGION)
-          PRIVATE_IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS --region $REGION --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
-          COMMA_SEPARATED_IPS=$(echo "$PRIVATE_IPS" | tr '\t' ',')
+          # Fetch private IPs of EC2 instances based on the tag
+          PRIVATE_IPS=$(aws ec2 describe-instances \
+            --filters "Name=tag:${TAG_KEY},Values=${TAG_VALUE}" \
+            --query 'Reservations[*].Instances[*].PrivateIpAddress' \
+            --output text --region $REGION | tr '\t' ',')
 
-
-          echo "$COMMA_SEPARATED_IPS" > /home/ubuntu/ipfile/ec2_private_ips.txt
-
-          IPS=$(cat /home/ubuntu/ipfile/ec2_private_ips.txt)
-          echo "EC2_PRIVATE_IPS=$IPS" >> $GITHUB_ENV
+          # Output the IPs as a GitHub environment variable
+          echo "EC2_PRIVATE_IPS=$PRIVATE_IPS" >> $GITHUB_ENV
 
       - name: SSH into each EC2 instance and run commands
         uses: appleboy/ssh-action@master
@@ -32,4 +31,4 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cat /etc/os-release 
+            mkdir ridham
