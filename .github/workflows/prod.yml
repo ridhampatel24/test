@@ -1,1 +1,37 @@
-
+name: Deploy
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy-production:
+    runs-on: self-hosted
+    steps:
+      - name: executing remote ssh commands in server 1
+        uses: appleboy/ssh-action@master
+        with:
+          host: 172.31.40.224
+          username: ubuntu
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+           cd /var/www/html/fanbasis-web-app
+           git pull origin master
+           php artisan migrate --force
+           php artisan config:clear
+           php artisan cache:clear
+           php artisan view:clear
+           php artisan route:clear
+      - name: executing remote ssh commands in server 2
+        uses: appleboy/ssh-action@master
+        with:
+          host: 172.31.29.42
+          username: ubuntu
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+           cd /var/www/html/fanbasis-web-app
+           git pull origin master
+           php artisan migrate --force
+           php artisan config:clear
+           php artisan cache:clear
+           php artisan view:clear
+           php artisan route:clear
