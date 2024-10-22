@@ -18,22 +18,26 @@ jobs:
           INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:${TAG_KEY},Values=${TAG_VALUE}" --query 'Reservations[*].Instances[*].InstanceId' --output text --region $REGION)
           PRIVATE_IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS --region $REGION --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
 
-          COMMA_SEPARATED_IPS=$(echo "$PRIVATE_IPS" | tr '\t' ',')
+          # Convert tab-separated IPs into a comma-separated list, each IP wrapped in double quotes
+          COMMA_SEPARATED_IPS=$(echo "$PRIVATE_IPS" | tr '\t' ',' | sed 's/\([^,]*\)/"\1"/g')
+
+          # Save the IPs to a file
           echo "$COMMA_SEPARATED_IPS" > /home/ubuntu/ipfile/ec2_private_ips.txt
+
+          # Print the formatted IPs for debugging
+          echo "Formatted Private IPs: $COMMA_SEPARATED_IPS"
 
       - name: Read the file and set IPs as an environment variable
         id: read_ips
         run: |
           IPS=$(cat /home/ubuntu/ipfile/ec2_private_ips.txt)
           echo "EC2_PRIVATE_IPS=$IPS" >> $GITHUB_ENV
-          echo $GITHUB_ENV
 
       - name: SSH into each EC2 instance and run commands
         uses: appleboy/ssh-action@master
         with:
-          hosts: ${{ env.EC2_PRIVATE_IPS }}
+          host: ${{ env.EC2_PRIVATE_IPS }}
           username: ubuntu
           key: ${{ secrets.SSH_KEY }}
           script: |
             mkdir ridham
-
