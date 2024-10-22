@@ -18,14 +18,17 @@ jobs:
           INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:${TAG_KEY},Values=${TAG_VALUE}" --query 'Reservations[*].Instances[*].InstanceId' --output text --region $REGION)
           PRIVATE_IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS --region $REGION --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
 
-          # Convert tab-separated IPs into a comma-separated list, each IP wrapped in double quotes
+          # Convert tab-separated IPs into a comma-separated list with double quotes
           COMMA_SEPARATED_IPS=$(echo "$PRIVATE_IPS" | tr '\t' ',' | sed 's/\([^,]*\)/"\1"/g')
+
+          # Add comma at the beginning and end
+          COMMA_SEPARATED_IPS=",$COMMA_SEPARATED_IPS,"
 
           # Save the IPs to a file
           echo "$COMMA_SEPARATED_IPS" > /home/ubuntu/ipfile/ec2_private_ips.txt
 
           # Print the formatted IPs for debugging
-          echo "Formatted Private IPs: $COMMA_SEPARATED_IPS"
+          echo "Formatted Private IPs with commas: $COMMA_SEPARATED_IPS"
 
       - name: Read the file and set IPs as an environment variable
         id: read_ips
@@ -40,4 +43,4 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cat /etc/os-release 
+            mkdir ridham
