@@ -13,8 +13,16 @@ jobs:
           REGION="ap-south-1"
           
           INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:${TAG_KEY},Values=${TAG_VALUE}" --query 'Reservations[*].Instances[*].InstanceId' --output text --region $REGION)
-
           PRIVATE_IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS --region $REGION --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
 
           echo "Private IPs: $PRIVATE_IPS"
           echo "::set-output name=EC2_PRIVATE_IPS::$PRIVATE_IPS"
+          
+      - name: executing remote ssh commands on all servers
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ steps.get_ec2_ips.outputs.EC2_PRIVATE_IPS }}
+          username: ubuntu
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+           mkdir ridham
