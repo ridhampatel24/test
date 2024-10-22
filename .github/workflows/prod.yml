@@ -31,4 +31,4 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_KEY }}
           script: |
-            mkdir ridham
+            cat /etc/os-release 
