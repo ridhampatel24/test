@@ -26,6 +26,7 @@ jobs:
         run: |
           IPS=$(cat /home/ubuntu/ipfile/ec2_private_ips.txt)
           echo "EC2_PRIVATE_IPS=$IPS" >> $GITHUB_ENV
+          echo $GITHUB_ENV
 
       - name: SSH into each EC2 instance and run commands
         uses: appleboy/ssh-action@master
