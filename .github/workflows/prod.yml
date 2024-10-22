@@ -1,22 +1,43 @@
 name: Deploy
+
 on:
   workflow_dispatch:
+
 jobs:
   deploy-production:
     runs-on: self-hosted
+
     steps:
+      - name: Create IP file directory if not exists and set permissions
+        run: |
+          DIRECTORY="/home/ubuntu/ipfile"
+          if [ ! -d "$DIRECTORY" ]; then
+            echo "Creating directory $DIRECTORY"
+            mkdir -p "$DIRECTORY"
+          fi
+          chmod 755 "$DIRECTORY"
+
       - name: Get EC2 Instances by Tag and Fetch Private IPs
         id: get_ec2_ips
         run: |
-          TAG_KEY="Owner"  
-          TAG_VALUE="Ridham" 
+          TAG_KEY="Owner"
+          TAG_VALUE="Ridham"
           REGION="ap-south-1"
           
+          # Fetch the EC2 instance IDs based on the tag
           INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:${TAG_KEY},Values=${TAG_VALUE}" --query 'Reservations[*].Instances[*].InstanceId' --output text --region $REGION)
+          
+          # Fetch the private IPs of those instances
           PRIVATE_IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS --region $REGION --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
+
+          # Convert new line-separated IPs into a comma-separated list
           COMMA_SEPARATED_IPS=$(echo "$PRIVATE_IPS" | tr '\n' ',')
           COMMA_SEPARATED_IPS=${COMMA_SEPARATED_IPS%,}  # Remove the trailing comma
 
-          # Output the IPs and save them to a file
+          # Output the IPs and save them to the custom file
           echo "Private IPs: $COMMA_SEPARATED_IPS"
           echo "$COMMA_SEPARATED_IPS" > /home/ubuntu/ipfile/ec2_private_ips.txt
+
+      - name: Verify the contents of the IP file
+        run: |
+          cat /home/ubuntu/ipfile/ec2_private_ips.txt
