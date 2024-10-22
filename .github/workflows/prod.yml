@@ -14,6 +14,7 @@ jobs:
           
           INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:${TAG_KEY},Values=${TAG_VALUE}" --query 'Reservations[*].Instances[*].InstanceId' --output text --region $REGION)
           PRIVATE_IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS --region $REGION --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
-
-          echo "Private IPs: $PRIVATE_IPS"
-          echo "$PRIVATE_IPS" > ec2_private_ips.txt 
+          COMMA_SEPARATED_IPS=$(echo "$PRIVATE_IPS" | tr '\n' ',')
+          COMMA_SEPARATED_IPS=${COMMA_SEPARATED_IPS%,}
+          echo "Private IPs: $COMMA_SEPARATED_IPS"
+          echo "$COMMA_SEPARATED_IPS" > /home/ubuntu/ipfile/ec2_private_ips.txt
