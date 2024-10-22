@@ -5,11 +5,16 @@ jobs:
   deploy-production:
     runs-on: self-hosted
     steps:
-      - name: executing remote ssh commands in server 1
-        uses: appleboy/ssh-action@master
-        with:
-          host: 172.31.10.103
-          username: ubuntu
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-           mkdir ridham
+      - name: Get EC2 Instances by Tag and Fetch Private IPs
+        id: get_ec2_ips
+        run: |
+          TAG_KEY="Owner"  
+          TAG_VALUE="Ridham" 
+          REGION="ap-south-1"
+          
+          INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:${TAG_KEY},Values=${TAG_VALUE}" --query 'Reservations[*].Instances[*].InstanceId' --output text --region $REGION)
+
+          PRIVATE_IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS --region $REGION --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
+
+          echo "Private IPs: $PRIVATE_IPS"
+          echo "::set-output name=EC2_PRIVATE_IPS::$PRIVATE_IPS"
