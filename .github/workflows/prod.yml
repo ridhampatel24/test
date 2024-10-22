@@ -22,7 +22,7 @@ jobs:
           COMMA_SEPARATED_IPS=$(echo "$PRIVATE_IPS" | tr '\t' ',' | sed 's/\([^,]*\)/"\1"/g')
 
           # Save the IPs to a file
-          echo '$COMMA_SEPARATED_IPS' > /home/ubuntu/ipfile/ec2_private_ips.txt
+          echo "$COMMA_SEPARATED_IPS" > /home/ubuntu/ipfile/ec2_private_ips.txt
 
           # Print the formatted IPs for debugging
           echo "Formatted Private IPs: $COMMA_SEPARATED_IPS"
