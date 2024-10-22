@@ -17,12 +17,3 @@ jobs:
 
           echo "Private IPs: $PRIVATE_IPS"
           echo "$PRIVATE_IPS" > ec2_private_ips.txt 
-          
-      - name: executing remote ssh commands on all servers
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ steps.get_ec2_ips.outputs.EC2_PRIVATE_IPS }}
-          username: ubuntu
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-           mkdir ridham
