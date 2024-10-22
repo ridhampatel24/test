@@ -22,7 +22,7 @@ jobs:
           COMMA_SEPARATED_IPS=$(echo "$PRIVATE_IPS" | tr '\t' ',' | sed 's/\([^,]*\)/"\1"/g')
 
           # Save the IPs to a file
-          echo "$COMMA_SEPARATED_IPS" > /home/ubuntu/ipfile/ec2_private_ips.txt
+          echo '$COMMA_SEPARATED_IPS' > /home/ubuntu/ipfile/ec2_private_ips.txt
 
           # Print the formatted IPs for debugging
           echo "Formatted Private IPs: $COMMA_SEPARATED_IPS"
@@ -36,7 +36,7 @@ jobs:
       - name: SSH into each EC2 instance and run commands
         uses: appleboy/ssh-action@master
         with:
-          host: "172.31.14.140,172.31.10.103"
+          host: ${{ env.EC2_PRIVATE_IPS }}
           username: ubuntu
           key: ${{ secrets.SSH_KEY }}
           script: |
