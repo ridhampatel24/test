@@ -16,7 +16,7 @@ jobs:
           PRIVATE_IPS=$(aws ec2 describe-instances --instance-ids $INSTANCE_IDS --region $REGION --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
 
           echo "Private IPs: $PRIVATE_IPS"
-          echo "::set-output name=EC2_PRIVATE_IPS::$PRIVATE_IPS"
+          echo "$PRIVATE_IPS" > ec2_private_ips.txt 
           
       - name: executing remote ssh commands on all servers
         uses: appleboy/ssh-action@master
